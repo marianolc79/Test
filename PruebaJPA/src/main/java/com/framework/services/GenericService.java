@@ -19,7 +19,7 @@ import org.springframework.data.domain.Sort;
  */
 public class GenericService<T extends Object, ID extends Serializable> {
 
-    private BaseDao<T, ID> dao = null;
+    privateeee BaseDao<T, ID> dao = null;
 
     public GenericService(String entName, EntityManager em) {
         initDao(entName, em);
