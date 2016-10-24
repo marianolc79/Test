@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:ent="http://framework.com/entities"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://framework.com/entities
+                classpath:/com/framework/data/entities.xsd">
+    <ent:entity id="com.framework.entities.Cliente">
+        <ent:namedQuery id="Cliente.findAll" type="jpql">
+            <![CDATA[
+            SELECT c FROM Cliente c
+            ]]>
+        </ent:namedQuery>        
+        <ent:namedQuery id="Cliente.findById" type="jpql">
+            <![CDATA[
+            SELECT c FROM Cliente c WHERE c.id = :id
+            ]]>
+        </ent:namedQuery>
+         <ent:namedQuery id="Cliente.findByIds" type="jpql">
+            <![CDATA[
+            SELECT c FROM Cliente c WHERE c.id = ?1 or c.id = ?2
+            ]]>
+        </ent:namedQuery>
+        <ent:queryOrder id="Cliente.findByIds">
+            <ent:column id="1" columnText = "c.id"/>
+        </ent:queryOrder>
+        <ent:queryOrder id="Cliente.findAll">
+            <ent:column id="1" columnText = "c.id"/>
+            <ent:column id="2" columnText = "c.nombre"/>
+            <ent:column id="3" columnText = "c.apellidos"/>
+            <ent:column id="4" columnText = "c.fechaNac"/>
+        </ent:queryOrder>
+    </ent:entity>
+</beans:beans>
+
+

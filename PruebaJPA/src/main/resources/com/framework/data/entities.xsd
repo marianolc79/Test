@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://framework.com/entities"
+           targetNamespace="http://framework.com/entities"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:beans="http://www.springframework.org/schema/beans"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <xs:import namespace="http://www.springframework.org/schema/beans"/>
+  
+    <xs:simpleType  name="namedQueryType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="jpql" />
+            <xs:enumeration value="native" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:element name="column">
+        <xs:complexType >        
+            <xs:attribute name="id" use="required"/>
+            <xs:attribute name="columnText" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="namedQuery">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="id" use="required"/>
+                    <xs:attribute name="type" default="jpql" type="namedQueryType"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="queryOrder">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="column" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:attribute name="id" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="entity">
+        <xs:complexType> 
+            <xs:complexContent>
+                <xs:extension base="beans:identifiedType">
+                    <xs:choice maxOccurs="unbounded">
+                        <xs:element ref="namedQuery"/>
+                        <xs:element ref="queryOrder"/>
+                    </xs:choice>                    
+                </xs:extension>
+            </xs:complexContent>    
+        </xs:complexType>        
+    </xs:element>
+</xs:schema>

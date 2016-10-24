@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+             xmlns:tx="http://www.springframework.org/schema/tx"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:p="http://www.springframework.org/schema/p"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/data/jpa
+    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd" xmlns:ns1="http://www.springframework.org/schema/data/repository">
+
+    <!-- Autoinyección del contexto -->
+    <beans:bean id="applicationContextProvider" class="com.framework.ApplicationContextProvider"></beans:bean>
+
+    <!-- Referencia al dataSource JNDI en context.xml -->
+    <beans:bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <beans:property name="jndiName" 
+                        value="java:comp/env/jdbc/tutorialDS" />
+    </beans:bean>
+   
+    
+    <!-- Entity Manager de JPA -->    
+    <beans:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <beans:property name="dataSource" ref="dataSource" />
+        <beans:property name="persistenceUnitName" value="myPU" />
+        <beans:property name="jpaVendorAdapter">
+            <beans:bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+                 <beans:property name="databasePlatform" value="org.eclipse.persistence.platform.database.MySQLPlatform" />
+                 <beans:property name="showSql" value="true" />
+                 <!--beans:property name="jpaDialect" value="org.springframework.orm.jpa.vendor.EclipseLinkJpaDialect" /-->
+            </beans:bean>
+        </beans:property>
+        <beans:property name="jpaPropertyMap">
+            <beans:props>
+                <beans:prop key="eclipselink.weaving">false</beans:prop>
+            </beans:props>
+        </beans:property>
+         <beans:property name="packagesToScan">
+            <beans:list>
+                <beans:value>com.framework.entities</beans:value>
+            </beans:list>
+        </beans:property>
+        <!--beans:property name="loadTimeWeaver">
+            <beans:bean class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" />
+        </beans:property-->     
+    </beans:bean>
+    
+    <!-- Gestor de transacciones-->
+    <beans:bean id="transactionManager"
+                class="org.springframework.orm.jpa.JpaTransactionManager" 
+                p:entityManagerFactory-ref="entityManagerFactory"/>
+
+    <beans:bean id="genericServiceFactory"
+                class="com.framework.services.GenericServicesFactory"/>
+    <!-- Registro de los DAO's de la aplicación -->
+    
+    <!-- Daos con implementación automática proporcionada por spring -->
+    <!--jpa:repositories base-package="com.framework.dao" factory-class="com.framework.data.DaoFactoryBean">
+    </jpa:repositories-->
+    <!--jpa:repositories base-package="com.framework.dao" entity-manager-factory-ref="entityManagerFactory" 
+                      transaction-manager-ref="transactionManager" 
+                      factory-class="com.framework.data.DaoFactoryBean">
+    </jpa:repositories-->
+    
+    <!-- Definición de repositorios con factoría. Es la factoría que crea la implementación. 
+        Atención. Si encuentra una implementación en el paquete (Impl) NO utiliza factoría
+    <jpa:repositories base-package="com.framework.dao" factory-class="com.framework.data.DaoFactoryBean">
+    </jpa:repositories>
+    -->
+    <!-- Caso especial de Dao con implementación propia con clase definida
+    <beans:bean id="userDao" class=""/>
+    -->
+    <!-- Caso de implementación con sujifo Impl. El framework lo detecta automáticamente -->
+    <!--jpa:repositories base-package="com.framework.dao"><jpa:repository id="clienteDao2"/></jpa:repositories-->
+    
+      <!-- Registro del traductor de excepciones. Exception translation bean post processor -->
+    <beans:bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+    <tx:annotation-driven />
+    <context:component-scan base-package="com.framework.services" >
+       <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+    <context:component-scan base-package="com.framework.dao">
+       <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+    
+    <beans:import resource="classpath*:com/framework/entities/**/*.xml" />
+    <!--jpa:repositories base-package="com.framework.dao">
+    </jpa:repositories-->
+
+
+</beans:beans>
